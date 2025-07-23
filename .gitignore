@@ -1,0 +1,20 @@
+# .gitignore
+
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*_test
+
+# Output of the go tool
+.cache
+
+# External files
+.env
+
+# IDE specific files (optional)
+.vscode/
+.idea/
