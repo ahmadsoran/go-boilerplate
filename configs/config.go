@@ -16,7 +16,7 @@ type Config struct {
 func LoadConfig() (config Config, err error) {
 	v := viper.New()
 
-	v.AddConfigPath(".") // Look for config in the current directory
+	v.AddConfigPath("./configs") // Look for config in the current directory
 	v.SetConfigName(".env")
 	v.SetConfigType("env")
 
