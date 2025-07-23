@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -57,7 +56,7 @@ func main() {
 	// Initialize repositories, services, and handlers using the initializer pattern
 	repos := initializer.NewRepositoryContainer(dbConn)
 	services := initializer.NewServiceContainer(repos, dbConn)
-	handlers := initializer.NewHandlerContainer(services)
+	handlers := initializer.NewHandlerContainer(services, dbConn)
 
 	// Set up Gin router
 	r := gin.Default()

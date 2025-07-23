@@ -1,17 +1,17 @@
-// internal/api/user_handler.go
-package api
+package handlers
 
 import (
 	"errors"
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"your_project/internal/logger"
 	"your_project/internal/model"
 	"your_project/internal/pkg"
 	"your_project/internal/service"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 var validate *validator.Validate
@@ -28,7 +28,7 @@ func NewUserHandler(svc service.UserService) *UserHandler {
 	return &UserHandler{svc}
 }
 
-func (h *UserHandler) RegisterRoutes(r *gin.Engine) {
+func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup) {
 	users := r.Group("/users")
 	{
 		users.POST("", h.CreateUser)
@@ -72,7 +72,7 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	user, err := h.svc.GetUser(c.Request.Context(), uint(id))
 	if err != nil {
 		h.handleError(c, err)
-		return	
+		return
 	}
 
 	c.JSON(http.StatusOK, user)

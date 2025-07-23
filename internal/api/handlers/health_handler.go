@@ -1,5 +1,4 @@
-// internal/api/health_handler.go
-package api
+package handlers
 
 import (
 	"net/http"

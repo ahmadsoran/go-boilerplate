@@ -4,11 +4,11 @@ package service
 import (
 	"context"
 
-	"gorm.io/gorm"
 	"your_project/internal/logger"
 	"your_project/internal/model"
-	"your_project/internal/pkg"
 	"your_project/internal/repository"
+
+	"gorm.io/gorm"
 )
 
 type UserService interface {

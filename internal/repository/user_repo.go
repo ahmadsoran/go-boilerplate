@@ -5,9 +5,10 @@ import (
 	"context"
 	"errors"
 
-	"gorm.io/gorm"
 	"your_project/internal/model"
 	"your_project/internal/pkg"
+
+	"gorm.io/gorm"
 )
 
 type UserRepository interface {
@@ -51,7 +52,7 @@ func (r *userRepository) Create(ctx context.Context, user *model.User) error {
 	}
 	return nil
 }
-unc (r *userRepository) Update(ctx context.Context, user *model.User) error {
+func (r *userRepository) Update(ctx context.Context, user *model.User) error {
 	// Pass the context to the GORM query
 	if err := r.db.WithContext(ctx).Save(user).Error; err != nil {
 		// Consider checking for specific errors like unique constraint violations

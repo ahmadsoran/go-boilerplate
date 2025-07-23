@@ -2,10 +2,11 @@
 package initializer
 
 import (
-	"gorm.io/gorm"
-	"your_project/internal/api"
+	"your_project/internal/api/handlers"
 	"your_project/internal/repository"
 	"your_project/internal/service"
+
+	"gorm.io/gorm"
 )
 
 type RepositoryContainer struct {
@@ -33,15 +34,15 @@ func NewServiceContainer(repos *RepositoryContainer, db *gorm.DB) *ServiceContai
 }
 
 type HandlerContainer struct {
-	User   *api.UserHandler
-	Health *api.HealthHandler
+	User   *handlers.UserHandler
+	Health *handlers.HealthHandler
 	// Add other handlers here
 }
 
 func NewHandlerContainer(svcs *ServiceContainer, db *gorm.DB) *HandlerContainer {
 	return &HandlerContainer{
-		User:   api.NewUserHandler(svcs.User),
-		Health: api.NewHealthHandler(db),
+		User:   handlers.NewUserHandler(svcs.User),
+		Health: handlers.NewHealthHandler(db),
 		// Add other handlers here
 	}
 }

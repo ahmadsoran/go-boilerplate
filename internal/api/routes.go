@@ -1,10 +1,10 @@
-// internal/api/routes.go
 package api
 
 import (
-	"github.com/gin-gonic/gin"
 	"your_project/internal/initializer"
 	"your_project/internal/middleware"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SetupRoutes registers all API routes and applies middleware
