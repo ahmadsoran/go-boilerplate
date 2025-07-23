@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"your_project/internal/logger"
+	userlogger "your_project/internal/logger/user-logger"
 	"your_project/internal/model"
 	"your_project/internal/repository"
 
@@ -37,7 +38,8 @@ func (s *userService) GetUser(ctx context.Context, id uint) (*model.User, error)
 }
 
 func (s *userService) CreateUser(ctx context.Context, user *model.User) error {
-	logger.Log.Info("Creating user", "user", user.Name)
+	logger := logger.APILog
+	logger.Info("Creating user", "user", user.Name)
 	// Add any business logic validation here and return pkg.NewInvalidInputError if needed
 
 	if err := s.repo.Create(ctx, user); err != nil {
@@ -49,6 +51,7 @@ func (s *userService) CreateUser(ctx context.Context, user *model.User) error {
 
 func (s *userService) UpdateUser(ctx context.Context, user *model.User) error {
 	// Add any business logic validation here and return pkg.NewInvalidInputError if needed
+	logger := userlogger.GetUserLogger(user.ID)
 
 	// Pass the context to the transaction
 	return s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
@@ -57,7 +60,7 @@ func (s *userService) UpdateUser(ctx context.Context, user *model.User) error {
 		oldUser, err := repoTx.GetByID(ctx, user.ID)
 		if err != nil {
 			// Propagate repository errors (e.g., NotFoundError)
-			logger.Log.Errorw("User not found during update transaction", "userID", user.ID, "error", err)
+			logger.Errorw("User not found during update transaction", "userID", user.ID, "error", err)
 			return err
 		}
 		oldUser.Email = user.Email
@@ -65,16 +68,17 @@ func (s *userService) UpdateUser(ctx context.Context, user *model.User) error {
 		// Pass the context to repository calls within the transaction
 		if err := repoTx.Update(ctx, oldUser); err != nil {
 			// Propagate repository errors
-			logger.Log.Errorw("Update failed during transaction", "userID", oldUser.ID, "error", err)
+			logger.Errorw("Update failed during transaction", "userID", oldUser.ID, "error", err)
 			return err
 		}
-		logger.Log.Info("User updated", "user", oldUser.ID)
+		logger.Info("User updated", "user", oldUser.ID)
 		return nil
 	})
 }
 
 func (s *userService) DeleteUser(ctx context.Context, id uint) error {
-	logger.Log.Info("Deleting user", "userID", id)
+	logger := userlogger.GetUserLogger(id)
+	logger.Info("Deleting user", "userID", id)
 	// Add any business logic validation here and return pkg.NewInvalidInputError if needed
 
 	if err := s.repo.Delete(ctx, id); err != nil {

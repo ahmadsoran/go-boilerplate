@@ -138,11 +138,11 @@ func (h *UserHandler) handleError(c *gin.Context, err error) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": invalidInputErr.Error()})
 	case errors.As(err, &internalServerErr):
 		// Log the original error for internal server errors
-		logger.Log.Errorw("Internal Server Error", "error", internalServerErr.Err, "message", internalServerErr.Message)
+		logger.APILog.Errorw("Internal Server Error", "error", internalServerErr.Err, "message", internalServerErr.Message)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	default:
 		// Log unexpected errors
-		logger.Log.Errorw("Unexpected Error", "error", err)
+		logger.APILog.Errorw("Unexpected Error", "error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	}
 }

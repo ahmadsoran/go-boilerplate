@@ -29,28 +29,28 @@ func main() {
 	// This will not overwrite existing environment variables
 	if err := godotenv.Load(); err != nil {
 		// Log a warning if the .env file is not found, but don't exit
-		logger.Log.Warnw("Error loading .env file, using environment variables", "error", err)
+		logger.SystemLog.Warnw("Error loading .env file, using environment variables", "error", err)
 	}
 
 	// Load configuration
 	config, err := configs.LoadConfig()
 	if err != nil {
-		logger.Log.Fatalw("Failed to load configuration", "error", err)
+		logger.SystemLog.Fatalw("Failed to load configuration", "error", err)
 	}
 
 	// Initialize database connection
 	dbConn, err := db.Init(config.DatabaseURL)
 	if err != nil {
-		logger.Log.Fatalw("DB connection failed", "error", err)
+		logger.SystemLog.Fatalw("DB connection failed", "error", err)
 	}
 
 	// Run Go-based migrations if AUTO_MIGRATE is true
 	if config.AutoMigrate {
-		logger.Log.Infow("Running Go-based migrations...")
+		logger.SystemLog.Infow("Running Go-based migrations...")
 		if err := migrations.AutoMigrate(dbConn); err != nil {
-			logger.Log.Fatalw("Go-based migration failed", "error", err)
+			logger.SystemLog.Fatalw("Go-based migration failed", "error", err)
 		}
-		logger.Log.Infow("Go-based migrations applied successfully.")
+		logger.SystemLog.Infow("Go-based migrations applied successfully.")
 	}
 
 	// Initialize repositories, services, and handlers using the initializer pattern
@@ -73,9 +73,9 @@ func main() {
 
 	// Run the server in a goroutine
 	go func() {
-		logger.Log.Infof("Server started on port %s", config.Port)
+		logger.SystemLog.Infof("Server started on port %s", config.Port)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			logger.Log.Fatalw("Server failed to start", "error", err)
+			logger.SystemLog.Fatalw("Server failed to start", "error", err)
 		}
 	}()
 
@@ -87,7 +87,7 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	logger.Log.Infow("Shutting down server...")
+	logger.SystemLog.Infow("Shutting down server...")
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
@@ -95,10 +95,10 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		logger.Log.Fatalw("Server forced to shutdown", "error", err)
+		logger.SystemLog.Fatalw("Server forced to shutdown", "error", err)
 	}
 
-	logger.Log.Infow("Server exiting")
+	logger.SystemLog.Infow("Server exiting")
 }
 
 // Remove the runMigrations function that used golang-migrate/migrate
