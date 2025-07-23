@@ -2,6 +2,7 @@
 package initializer
 
 import (
+	"your_project/configs"
 	"your_project/internal/api/handlers"
 	"your_project/internal/repository"
 	"your_project/internal/service"
@@ -39,9 +40,9 @@ type HandlerContainer struct {
 	// Add other handlers here
 }
 
-func NewHandlerContainer(svcs *ServiceContainer, db *gorm.DB) *HandlerContainer {
+func NewHandlerContainer(svcs *ServiceContainer, db *gorm.DB, config configs.Config) *HandlerContainer {
 	return &HandlerContainer{
-		User:   handlers.NewUserHandler(svcs.User),
+		User:   handlers.NewUserHandler(svcs.User, config),
 		Health: handlers.NewHealthHandler(db),
 		// Add other handlers here
 	}

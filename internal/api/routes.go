@@ -1,14 +1,19 @@
 package api
 
 import (
+	"your_project/configs"
 	"your_project/internal/initializer"
 	"your_project/internal/middleware"
+	"your_project/internal/pkg"
 
 	"github.com/gin-gonic/gin"
 )
 
 // SetupRoutes registers all API routes and applies middleware
-func SetupRoutes(r *gin.Engine, handlers *initializer.HandlerContainer) {
+func SetupRoutes(r *gin.Engine, handlers *initializer.HandlerContainer, config configs.Config) {
+	// Initialize JWT manager for middleware
+	jwtManager := pkg.NewJWTManager(config.JWTSecret, config.JWTExpiryHours)
+
 	// Apply global middleware
 	r.Use(middleware.RecoveryMiddleware())
 	r.Use(middleware.RequestIDMiddleware())
@@ -20,9 +25,23 @@ func SetupRoutes(r *gin.Engine, handlers *initializer.HandlerContainer) {
 	// Group routes by functionality or version
 	apiRoutes := r.Group("/api")
 	{
-		// User routes
-		handlers.User.RegisterRoutes(apiRoutes)
+		// Authentication routes (public) - handled within the user handler
+		authRoutes := apiRoutes.Group("/auth")
+		{
+			authRoutes.POST("/signup", handlers.User.SignUp)
+			authRoutes.POST("/login", handlers.User.Login)
+			authRoutes.POST("/refresh", handlers.User.RefreshToken)
+		}
 
-		// Add other module routes here (e.g., handlers.Product.RegisterRoutes(apiRoutes))
+		// Protected user routes
+		protectedUsers := apiRoutes.Group("/users")
+		protectedUsers.Use(middleware.AuthMiddleware(jwtManager))
+		{
+			protectedUsers.GET("/:id", handlers.User.GetUser)
+			protectedUsers.PUT("/:id", handlers.User.UpdateUser)
+			protectedUsers.DELETE("/:id", handlers.User.DeleteItem)
+		}
+
+		// Add other module routes here
 	}
 }

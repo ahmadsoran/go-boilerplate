@@ -8,9 +8,11 @@ import (
 )
 
 type Config struct {
-	DatabaseURL string `mapstructure:"DATABASE_URL"`
-	Port        string `mapstructure:"PORT"`
-	AutoMigrate bool   `mapstructure:"AUTO_MIGRATE"`
+	DatabaseURL    string `mapstructure:"DATABASE_URL"`
+	Port           string `mapstructure:"PORT"`
+	AutoMigrate    bool   `mapstructure:"AUTO_MIGRATE"`
+	JWTSecret      string `mapstructure:"JWT_SECRET"`
+	JWTExpiryHours int    `mapstructure:"JWT_EXPIRY_HOURS"`
 }
 
 func LoadConfig() (config Config, err error) {
@@ -32,6 +34,7 @@ func LoadConfig() (config Config, err error) {
 
 	// Set default value for AUTO_MIGRATE if not provided
 	v.SetDefault("AUTO_MIGRATE", false)
+	v.SetDefault("JWT_EXPIRY_HOURS", 24) // Default to 24 hours
 
 	err = v.Unmarshal(&config)
 	return

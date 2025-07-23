@@ -3,16 +3,22 @@ package handlers
 import (
 	"net/http"
 
+	"your_project/internal/pkg"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type HealthHandler struct {
+	*BaseHandler
 	db *gorm.DB
 }
 
 func NewHealthHandler(db *gorm.DB) *HealthHandler {
-	return &HealthHandler{db}
+	return &HealthHandler{
+		BaseHandler: NewBaseHandler(),
+		db:          db,
+	}
 }
 
 func (h *HealthHandler) RegisterRoutes(r *gin.Engine) {
@@ -23,11 +29,11 @@ func (h *HealthHandler) CheckHealth(c *gin.Context) {
 	// Check database connection
 	sqlDB, err := h.db.DB()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"status": "DOWN", "database": "DOWN"})
+		h.ErrorHandler.HandleError(c, pkg.NewDatabaseConnectionError("postgresql", err, "Failed to get database instance"))
 		return
 	}
 	if err := sqlDB.Ping(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"status": "DOWN", "database": "DOWN"})
+		h.ErrorHandler.HandleError(c, pkg.NewDatabaseConnectionError("postgresql", err, "Database ping failed"))
 		return
 	}
 

@@ -56,13 +56,13 @@ func main() {
 	// Initialize repositories, services, and handlers using the initializer pattern
 	repos := initializer.NewRepositoryContainer(dbConn)
 	services := initializer.NewServiceContainer(repos, dbConn)
-	handlers := initializer.NewHandlerContainer(services, dbConn)
+	handlers := initializer.NewHandlerContainer(services, dbConn, config)
 
 	// Set up Gin router
 	r := gin.Default()
 
 	// Setup routes and apply middleware
-	api.SetupRoutes(r, handlers)
+	api.SetupRoutes(r, handlers, config)
 
 	// Create the HTTP server
 	serverAddr := fmt.Sprintf(":%s", config.Port)
